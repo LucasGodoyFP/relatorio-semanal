@@ -10,23 +10,15 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import cm
 from reportlab.lib.enums import TA_CENTER
 
-# ===== SISTEMA DE SIMULAÇÃO DE DATA =====
-MODO_SIMULACAO = True
-
-if MODO_SIMULACAO:
-    DATA_SIMULADA = datetime(2026, 4, 8, 10, 0, 0)
-    print(f"⚠️ MODO DE SIMULAÇÃO ATIVO!")
-    print(f"📅 Data simulada: {DATA_SIMULADA.strftime('%A, %d/%m/%Y %H:%M')}")
-    print(f"🎯 Testando comportamento para quarta-feira 10:00\n")
-else:
-    DATA_SIMULADA = None
-
+# ============================================================
+# FUNÇÕES DE DATA (sem simulação)
+# ============================================================
 def get_datetime_atual():
-    if MODO_SIMULACAO and DATA_SIMULADA:
-        return DATA_SIMULADA
+    """Retorna a data/hora atual real"""
     return datetime.now()
 
 def data_referencia():
+    """Retorna o início da semana atual (segunda-feira)"""
     hoje = get_datetime_atual()
     inicio_semana = hoje - timedelta(days=hoje.weekday())
     return inicio_semana
@@ -76,7 +68,7 @@ FONT_SMALL  = ("Segoe UI", 9)
 FONT_HERO   = ("Segoe UI", 20, "bold")
 
 # ============================================================
-# PERSISTÊNCIA (lógica original intacta)
+# PERSISTÊNCIA
 # ============================================================
 def carregar_dados():
     if os.path.exists(DATA_FILE):
@@ -154,7 +146,7 @@ def aplicar_selecoes_salvas(dados):
                     label.config(bg=info.get('cor', SURFACE))
 
 # ============================================================
-# LÓGICA DE PRAZO (original intacta)
+# LÓGICA DE PRAZO
 # ============================================================
 def verificar_prazo(nome_pedido):
     agora = get_datetime_atual()
@@ -189,7 +181,7 @@ def on_check(var, label, nome_pedido, salvar=True):
         salvar_dados()
 
 # ============================================================
-# CRIAÇÃO DE SEÇÃO — novo visual
+# CRIAÇÃO DE SEÇÃO
 # ============================================================
 def criar_secao(titulo, pedidos, master_frame, lista_vars_labels, cor_acento=ACCENT):
     outer = tk.Frame(master_frame, bg=SURFACE, highlightthickness=1,
@@ -249,7 +241,7 @@ def criar_secao(titulo, pedidos, master_frame, lista_vars_labels, cor_acento=ACC
             linha += 1
 
 # ============================================================
-# SEÇÃO QUARTA (original intacta, visual atualizado)
+# SEÇÃO QUARTA
 # ============================================================
 def atualizar_secao_quarta():
     global vars_labels_quarta
@@ -286,7 +278,7 @@ def limpar_selecoes():
         messagebox.showinfo("Sucesso", "✅ Nova semana iniciada!\nTodos os checkboxes foram limpos.")
 
 # ============================================================
-# GERAÇÃO DE PDF (lógica original intacta)
+# GERAÇÃO DE PDF
 # ============================================================
 def gerar_relatorio_pdf():
     arquivo_pdf = filedialog.asksaveasfilename(
@@ -318,6 +310,7 @@ def gerar_relatorio_pdf():
             if not verificar_prazo(pedido):
                 atrasadas.append(pedido)
 
+    total_pedidos = len(prazo_segunda) + len(entregas_internas) + len(entregas_externas)
     total_selecionados = (len(vars_labels_segunda) + len(vars_labels_quarta)) - len(pendentes)
     total_recebido_no_prazo = total_selecionados - len(atrasadas)
 
@@ -345,16 +338,10 @@ def gerar_relatorio_pdf():
     story.append(Spacer(1, 0.2*cm))
     story.append(Paragraph(f"Período: {periodo_str}", subtitulo_style))
     story.append(Paragraph(f"Data/Hora: {get_datetime_atual().strftime('%d/%m/%Y %H:%M')}", subtitulo_style))
-
-    if MODO_SIMULACAO:
-        story.append(Paragraph("⚠️ RELATÓRIO GERADO EM MODO DE SIMULAÇÃO ⚠️",
-                                ParagraphStyle('Warning', parent=normal_style,
-                                               textColor=colors.red, alignment=TA_CENTER)))
-
     story.append(Spacer(1, 0.5*cm))
 
     resumo_data = [
-        ['Total de requisições:', str(total_selecionados)],
+        ['Total de requisições:', str(total_pedidos)],
         ['✅ Recebidas no prazo:', str(total_recebido_no_prazo)],
         ['⚠️ Atrasadas:', str(len(atrasadas))],
         ['📌 Pendentes:', str(len(pendentes))]
@@ -461,7 +448,7 @@ header_frame = tk.Frame(scrollable_frame, bg="#0d1020", height=80)
 header_frame.pack(fill="x")
 header_frame.pack_propagate(False)
 
-# Linha decorativa no topo do header (gradiente simulado via múltiplos frames)
+# Linha decorativa no topo do header
 stripe = tk.Frame(header_frame, bg=ACCENT, height=3)
 stripe.pack(fill="x", side="top")
 
@@ -477,14 +464,6 @@ tk.Label(header_inner,
          text="Almoxarifado",
          font=FONT_SMALL,
          bg="#0d1020", fg=MUTED).pack(side="left", padx=(10, 0), pady=22)
-
-# Badge simulação
-if MODO_SIMULACAO:
-    sim_badge = tk.Label(header_inner,
-                         text=f"  ⚠  SIMULAÇÃO: {get_datetime_atual().strftime('%d/%m/%Y %H:%M')}  ",
-                         font=FONT_SMALL, bg="#3d1a0a", fg="#f97316",
-                         relief="flat", padx=6, pady=2)
-    sim_badge.pack(side="right", pady=22)
 
 # ── INFO SEMANA ─────────────────────────────────────────────
 info_bar = tk.Frame(scrollable_frame, bg=SURFACE2, height=34)

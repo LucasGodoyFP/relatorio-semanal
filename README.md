@@ -25,10 +25,10 @@
 </details>
 
 <p align="center">
-    <img src=".github/assets/controle-de-pedidos.png" alt="formulario-pedidos" width="600px">
+    <img src=".github/assets/controle-de-pedidos.png" alt="formulario-pedidos" width="1600px">
 </p>
 <p align="center">
-    <img src=".github/assets/relatorio-semanal.png" alt="formulario-pedidos" width="600px">
+    <img src=".github/assets/relatorio-semanal.png" alt="formulario-pedidos" width="400px">
 </p>
 
 <h2 id="about"> Sobre</h2>
